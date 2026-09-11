@@ -1,0 +1,26 @@
+interface:
+  display_name: "Code Repo Steward"
+  short_description: "代码仓库管家：项目体检、立规范、文档脱水瘦身与任务全生命周期管理"
+  default_prompt: "使用 $code-repo-steward 对当前项目进行工程体检与规范治理，检查代码违规、单轨改造落实情况并管理任务清单。"
+compatibility:
+  canonical_format: "agent-skills"
+  adapter_targets:
+    - "openai"
+    - "claude"
+    - "generic"
+    - "vscode"
+  activation:
+    mode: "manual"
+    paths: []
+  execution:
+    context: "inline"
+    shell: "bash"
+  trust:
+    source_tier: "local"
+    remote_inline_execution: "forbid"
+    remote_metadata_policy: "allow-metadata-only"
+  degradation:
+    openai: "metadata-adapter"
+    claude: "neutral-source-plus-adapter"
+    generic: "neutral-source"
+    vscode: "agent-skills-source-with-vscode-notes"

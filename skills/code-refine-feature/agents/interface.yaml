@@ -1,0 +1,26 @@
+interface:
+  display_name: "Code Refine Feature"
+  short_description: "已有功能的局部完善、缺陷修补、前后端接口适配与流程闭环"
+  default_prompt: "使用 $code-refine-feature 对已有功能进行局部修补与接口适配，采用快修直达与契约门禁两级通道，前后端精准对齐。"
+compatibility:
+  canonical_format: "agent-skills"
+  adapter_targets:
+    - "openai"
+    - "claude"
+    - "generic"
+    - "vscode"
+  activation:
+    mode: "manual"
+    paths: []
+  execution:
+    context: "inline"
+    shell: "bash"
+  trust:
+    source_tier: "local"
+    remote_inline_execution: "forbid"
+    remote_metadata_policy: "allow-metadata-only"
+  degradation:
+    openai: "metadata-adapter"
+    claude: "neutral-source-plus-adapter"
+    generic: "neutral-source"
+    vscode: "agent-skills-source-with-vscode-notes"
