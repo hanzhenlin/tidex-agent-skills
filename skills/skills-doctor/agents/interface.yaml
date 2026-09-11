@@ -1,0 +1,26 @@
+interface:
+  display_name: "Skills Doctor"
+  short_description: "全系统 AI Agent 技能体检与生态治理管家：清理死链、化解版本冲突、补齐跨端契约、文档脱水与生命周期管理"
+  default_prompt: "使用 $skills-doctor 对本机所有 Agent 宿主环境（~/.agents, ~/.claude, ~/.codex, ~/.zcode 等）进行全面技能体检与治理排查。"
+compatibility:
+  canonical_format: "agent-skills"
+  adapter_targets:
+    - "openai"
+    - "claude"
+    - "generic"
+    - "vscode"
+  activation:
+    mode: "manual"
+    paths: []
+  execution:
+    context: "inline"
+    shell: "bash"
+  trust:
+    source_tier: "local"
+    remote_inline_execution: "forbid"
+    remote_metadata_policy: "allow-metadata-only"
+  degradation:
+    openai: "metadata-adapter"
+    claude: "neutral-source-plus-adapter"
+    generic: "neutral-source"
+    vscode: "agent-skills-source-with-vscode-notes"

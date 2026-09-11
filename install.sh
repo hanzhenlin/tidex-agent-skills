@@ -20,7 +20,7 @@ LOCAL_SKILLS_DIR="${SCRIPT_DIR}/skills"
 GLOBAL_STORE_DIR="${HOME}/.tidex-skills"
 
 # 默认待安装/管理的技能清单
-AVAILABLE_SKILLS=("code-repo-steward" "code-start-feature" "code-refine-feature")
+AVAILABLE_SKILLS=("code-repo-steward" "code-start-feature" "code-refine-feature" "skills-doctor")
 
 # 打印横幅
 print_banner() {
