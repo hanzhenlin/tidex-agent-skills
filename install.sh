@@ -108,7 +108,7 @@ ensure_source_skills() {
         mkdir -p "${GLOBAL_STORE_DIR}"
         # 如果是远程 curl 运行，可以通过 git clone 获取源码
         if command -v git >/dev/null 2>&1; then
-            git clone --depth=1 https://github.com/tidexai/tidex-agent-skills.git "${GLOBAL_STORE_DIR}" >/dev/null 2>&1
+            git clone --depth=1 https://github.com/hanzhenlin/tidex-agent-skills.git "${GLOBAL_STORE_DIR}" >/dev/null 2>&1
             SOURCE_DIR="${GLOBAL_STORE_DIR}/skills"
         else
             echo -e "${RED}[✗] 未找到本地 skills 目录且未安装 git，无法初始化基准源。${RESET}"

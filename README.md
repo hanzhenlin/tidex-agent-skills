@@ -39,7 +39,7 @@
 
 ```bash
 # 1. 克隆本仓库到本地
-git clone https://github.com/tidexai/tidex-agent-skills.git
+git clone https://github.com/hanzhenlin/tidex-agent-skills.git
 
 # 2. 进入目录并执行一键安装
 cd tidex-agent-skills
