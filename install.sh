@@ -20,7 +20,7 @@ LOCAL_SKILLS_DIR="${SCRIPT_DIR}/skills"
 GLOBAL_STORE_DIR="${HOME}/.tidex-skills"
 
 # 默认待安装/管理的技能清单
-AVAILABLE_SKILLS=("code-repo-steward" "code-start-feature" "code-refine-feature")
+AVAILABLE_SKILLS=("code-repo-steward" "code-start-feature" "code-refine-feature" "nuwa-skill")
 
 # 打印横幅
 print_banner() {
@@ -197,6 +197,7 @@ do_install() {
     echo -e "  • ${BOLD}code-repo-steward${RESET}   - 代码仓库管家（体检/立规/脱水瘦身/任务管理）"
     echo -e "  • ${BOLD}code-start-feature${RESET}  - 新功能从0到1启动开发（轻量规划/5点一线雷达扫）"
     echo -e "  • ${BOLD}code-refine-feature${RESET} - 已有功能精修与修补（快修直达/契约门禁/前后端对齐）"
+    echo -e "  • ${BOLD}nuwa-skill${RESET}          - 女娲造人（思维框架提炼/人物视角与技能蒸馏工厂）"
     echo "============================================================"
 }
 
