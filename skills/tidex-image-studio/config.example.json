@@ -1,0 +1,31 @@
+{
+  "default_provider": "my-grok-relay",
+  "proxy_url": "http://127.0.0.1:7897",
+  "providers": [
+    {
+      "name": "my-grok-relay",
+      "type": "grok",
+      "base_url": "https://your-grok-relay-endpoint.example",
+      "api_key": "YOUR_GROK_API_KEY_HERE",
+      "default_model": "grok-imagine-image",
+      "models": [
+        "grok-imagine-image",
+        "grok-imagine-image-quality",
+        "grok-imagine",
+        "grok-imagine-edit",
+        "grok-imagine-1"
+      ]
+    },
+    {
+      "name": "my-gemini-relay",
+      "type": "gemini",
+      "base_url": "https://your-gemini-relay-endpoint.example",
+      "api_key": "YOUR_GEMINI_API_KEY_HERE",
+      "default_model": "gemini-3.1-flash-image",
+      "models": [
+        "gemini-3.1-flash-image",
+        "gemini-3-pro-image"
+      ]
+    }
+  ]
+}
