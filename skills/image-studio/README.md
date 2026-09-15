@@ -8,13 +8,13 @@
 ## 🌟 核心特性
 
 - **多大模型官方标准支持**：
-  - **xAI Grok 官方生图家族**：`grok-imagine-image`（标准）、`grok-imagine-image-quality`（高画质）、`grok-imagine` 等；
-  - **Google Gemini 官方生图家族**：`gemini-3.1-flash-image`、`gemini-3-pro-image`。
-- **开源级多供应商配置**：用户可同时配置多家不同中转站（如 Sub2API、CC Host、官方直连等），赋予全局唯一 `name`，根配置自由切换 `default_provider`。
+  - **xAI Grok 官方生图家族**：`grok-imagine-image`（标准）、`grok-imagine-image-quality`（高画质）、`grok-imagine`；
+  - **Google Gemini 官方生图家族**：`gemini-3.1-flash-image`。
+- **开源级多供应商配置**：用户可同时配置多家不同 API 服务商或官方直连接口，赋予全局唯一 `name`，根配置自由切换 `default_provider`。
 - **严格模型配套校验 (Strict Compatibility Check)**：防跨站乱调扣费，若指定模型不属于该供应商受支持的 `models` 列表，本地毫秒级拦截报错。
 - **「直读 > 代理 > URL」三级交付流水线**：
   1. **直读 (Direct)**：优先直接拉取，境内外通畅时毫秒级存盘；
-  2. **代理 (Proxy via proxy_url)**：若境外 CDN（如 `imgen.x.ai`）直连受阻超时，自动借力配置的本地代理（如 `127.0.0.1:7897`）保存图片；
+  2. **代理 (Proxy via proxy_url)**：若境外 CDN 直连受阻超时，自动借力配置的本地代理（如 `127.0.0.1:7897`）保存图片；
   3. **官方直链 (URL Fallback)**：无代理时原样交付官方直链，保证 100% 任务必达，绝不丢图。
 - **零外部依赖与纯净安全**：仅依赖 Python 3 标准库，零第三方 npm/pip 包，绝不引入外部公共镜像中转，100% 保护提示词与图片隐私。
 
@@ -36,32 +36,29 @@ chmod 600 ~/.tidex/tidex-agent-skills/config/image-studio/config.json
 ### 2. 编辑填入凭证
 ```json
 {
-  "default_provider": "my-grok-relay",
+  "default_provider": "grok-provider",
   "proxy_url": "http://127.0.0.1:7897",
   "providers": [
     {
-      "name": "my-grok-relay",
+      "name": "grok-provider",
       "type": "grok",
-      "base_url": "https://s2a.ii.sb",
+      "base_url": "https://api.example.com",
       "api_key": "YOUR_GROK_KEY",
       "default_model": "grok-imagine-image",
       "models": [
         "grok-imagine-image",
         "grok-imagine-image-quality",
-        "grok-imagine",
-        "grok-imagine-edit",
-        "grok-imagine-1"
+        "grok-imagine"
       ]
     },
     {
-      "name": "my-gemini-relay",
+      "name": "gemini-provider",
       "type": "gemini",
-      "base_url": "https://cchost.ai",
+      "base_url": "https://api.example.com",
       "api_key": "YOUR_GEMINI_KEY",
       "default_model": "gemini-3.1-flash-image",
       "models": [
-        "gemini-3.1-flash-image",
-        "gemini-3-pro-image"
+        "gemini-3.1-flash-image"
       ]
     }
   ]

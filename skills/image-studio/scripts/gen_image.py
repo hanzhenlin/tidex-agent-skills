@@ -424,14 +424,14 @@ def main() -> None:
         epilog=(
             "调度规则:\n"
             "  • 全默认:   python3 gen_image.py \"提示词\"             -> 走默认供应商的默认模型\n"
-            "  • 选供应商: python3 gen_image.py \"提示词\" -p cchost-gemini -> 走指定供应商的默认模型\n"
+            "  • 选供应商: python3 gen_image.py \"提示词\" -p gemini-provider -> 走指定供应商的默认模型\n"
             "  • 选模型:   python3 gen_image.py \"提示词\" -m gemini-3.1-flash-image -> 自动匹配对应供应商\n"
             "  • 严格配套: 同时指定 -p 和 -m 时，模型必须属于该供应商，否则强制拦截报错\n"
         ),
     )
     parser.add_argument("prompt", nargs="?", default=None, help="生图提示词")
     parser.add_argument("-p", "--provider", default=None, metavar="NAME",
-                        help="指定使用的供应商名字（如 s2a-grok, cchost-gemini）")
+                        help="指定使用的供应商名字（如 grok-provider, gemini-provider）")
     parser.add_argument("-m", "--model", default=None, metavar="ID",
                         help="指定模型名（如 grok-imagine-image, gemini-3.1-flash-image）")
     parser.add_argument("--aspect", default="1:1", choices=list(ASPECT_TO_SIZE_MAP.keys()),
