@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Tidex Image Studio - 开源级多模型 AI 图像生成工作站。
+"""Image Studio - 开源级多模型 AI 图像生成工作站。
 
 支持供应商命名路由与严格模型配套机制：
 - 默认调度：不指定参数时，自动走根配置 default_provider 及该供应商的 default_model
@@ -11,8 +11,8 @@
 三级交付流水线：
   直读 (Direct) > 代理 (Proxy via proxy_url) > 官方 URL 兜底 (Fallback)
 
-配置位置：
-  ~/.config/tidex-image-studio/config.json
+配置位置（唯一硬核规则路径）：
+  ~/.tidex/tidex-agent-skills/config/image-studio/config.json
 """
 
 import argparse
@@ -30,8 +30,10 @@ from pathlib import Path
 DATA_URL_RE = re.compile(r"data:image/([a-zA-Z0-9.+-]+);base64,([A-Za-z0-9+/=\r\n]+)")
 MARKDOWN_IMG_RE = re.compile(r"!\[.*?\]\((https?://[^\s\)]+)\)")
 
-# 配置文件
-CONFIG_FILE = Path.home() / ".config" / "tidex-image-studio" / "config.json"
+# 唯一硬核配置路径
+CONFIG_FILE = (
+    Path.home() / ".tidex" / "tidex-agent-skills" / "config" / "image-studio" / "config.json"
+)
 _CONFIG: dict = {}
 
 # 宽高比映射
@@ -58,14 +60,23 @@ def warn(msg: str) -> None:
 def load_config() -> dict:
     global _CONFIG
     if not CONFIG_FILE.is_file():
-        fail(f"配置文件未找到: {CONFIG_FILE}\n请创建该文件并配置供应商。", 1)
+        fail(
+            f"配置文件未找到: {CONFIG_FILE}\n"
+            f"Tidex 严格推行单一硬核配置规范，请创建该配置目录与文件并配置供应商。\n"
+            f"参考命令:\n"
+            f"  mkdir -p {CONFIG_FILE.parent}\n"
+            f"  chmod 700 {CONFIG_FILE.parent}\n"
+            f"  touch {CONFIG_FILE} && chmod 600 {CONFIG_FILE}",
+            1,
+        )
+
     try:
         if CONFIG_FILE.stat().st_mode & 0o077:
             warn(f"config.json 权限过宽，建议执行: chmod 600 {CONFIG_FILE}")
         _CONFIG = json.loads(CONFIG_FILE.read_text(encoding="utf-8"))
         return _CONFIG
     except Exception as e:
-        fail(f"config.json 读取失败: {e}", 1)
+        fail(f"config.json 读取失败 ({CONFIG_FILE}): {e}", 1)
 
 
 def get_providers() -> list:
@@ -381,10 +392,34 @@ def do_check(args) -> None:
     print(json.dumps(info, ensure_ascii=False, indent=2))
 
 
+def check_for_updates_silently() -> None:
+    """启动前轻量静默版本预检，基于本地 TTL 缓存节流，绝不阻塞生图主任务。"""
+    try:
+        # 寻找仓库根目录下的 scripts/check_update.py
+        checker_script = (
+            Path(__file__).resolve().parent.parent.parent.parent
+            / "scripts"
+            / "check_update.py"
+        )
+        if checker_script.is_file():
+            sys.path.insert(0, str(checker_script.parent))
+            import check_update
+
+            msg = check_update.check_update_silent(
+                project_name="tidex-agent-skills",
+                repo="hanzhenlin/tidex-agent-skills",
+            )
+            if msg:
+                warn(msg)
+    except Exception:
+        pass
+
+
 def main() -> None:
+    check_for_updates_silently()
     parser = argparse.ArgumentParser(
         prog="gen_image.py",
-        description="Tidex Image Studio - 开源级多模型 AI 图像生成工作站 (Grok & Gemini 官方原生引擎)",
+        description="Image Studio - 开源级多模型 AI 图像生成工作站 (Grok & Gemini 官方原生引擎)",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=(
             "调度规则:\n"

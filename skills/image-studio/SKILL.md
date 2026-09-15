@@ -1,12 +1,12 @@
 ---
-name: tidex-image-studio
-description: Use when 用户需要进行 AI 图像生成、艺术插画创作、海报设计或视觉渲染——统一驱动 Google Gemini Nano Banana 与 xAI Grok 多官方大模型，支持供应商命名路由与严格模型配套校验，自适应「直读 > 代理 > URL」三级交付流水线
-version: 3.0.0
-display_name: "Tidex AI 图像创作工作站"
-display_name_en: "Tidex Image Studio"
+name: image-studio
+description: Use when 用户需要进行 AI 图像生成、艺术插画创作、海报设计或视觉渲染——统一驱动 Google Gemini 与 xAI Grok 多官方大模型，支持供应商命名路由与严格模型配套校验，自适应「直读 > 代理 > URL」三级交付流水线
+version: 3.1.0
+display_name: "AI 图像创作工作站"
+display_name_en: "Image Studio"
 ---
 
-# Tidex Image Studio (全能 AI 图像创作工作站)
+# Image Studio (全能 AI 图像创作工作站)
 
 面向开源生态设计的多供应商、多模型工业级图像生成工作站。支持任意中转站接入，提供供应商命名路由、严格模型配套校验，以及「直读 > 代理 > URL」三级零故障交付流水线。
 
@@ -23,9 +23,9 @@ display_name_en: "Tidex Image Studio"
 
 ---
 
-## ⚙️ 统一配置规范 (`~/.config/tidex-image-studio/config.json`)
+## ⚙️ 统一配置规范 (`~/.tidex/tidex-agent-skills/config/image-studio/config.json`)
 
-配置文件结构清晰、面向开源设计，用户可自由对接任意中转站（Sub2API、CC Host、官方直连等）：
+配置文件结构清晰、面向开源设计，严格收纳在 Tidex 项目专属配置空间：
 
 ```json
 {

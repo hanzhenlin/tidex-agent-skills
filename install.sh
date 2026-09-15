@@ -17,10 +17,10 @@ RESET="\033[0m"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LOCAL_SKILLS_DIR="${SCRIPT_DIR}/skills"
-GLOBAL_STORE_DIR="${HOME}/.tidex-skills"
+GLOBAL_STORE_DIR="${HOME}/.tidex/tidex-agent-skills/store"
 
 # 默认待安装/管理的技能清单
-AVAILABLE_SKILLS=("code-repo-steward" "code-start-feature" "code-refine-feature" "skills-doctor" "tidex-image-studio")
+AVAILABLE_SKILLS=("code-repo-steward" "code-start-feature" "code-refine-feature" "skills-doctor" "image-studio")
 
 # 打印横幅
 print_banner() {
@@ -40,14 +40,100 @@ show_help() {
     echo -e "${BOLD}选项列表:${RESET}"
     echo "  (无参数)              全端智能探测安装（自动打通所有已识别的 Agent）"
     echo "  -u, --uninstall      安全卸载已挂载的 Tidex 技能软链接"
+    echo "  -c, --check-update   检查 GitHub 是否有新版本发布"
     echo "  -t, --target <DIR>   指定安装到特定目录（例如指定项目的 .agents/skills）"
     echo "  -l, --list           查看当前系统中各 Agent 的安装与挂载状态"
     echo "  -h, --help           显示此帮助信息"
     echo ""
     echo -e "${BOLD}示例:${RESET}"
     echo "  bash install.sh                  # 全自动安装"
+    echo "  bash install.sh --check-update   # 检查新版本"
     echo "  bash install.sh --uninstall      # 卸载技能"
     echo "  bash install.sh -t ./my-project/.agents/skills"
+    echo ""
+}
+
+# ------------------------------------------------------------------------------
+# 安装前置：老环境嗅探净化与配置智能迁移
+# ------------------------------------------------------------------------------
+pre_install_migration_and_cleanup() {
+    echo -e "${BOLD}[0/3] 正在执行老环境嗅探与规范性体检...${RESET}"
+    local clean_status=true
+
+    # 1. 嗅探并迁移新老历史生图配置（新老都要扫）
+    local target_cfg="${HOME}/.tidex/tidex-agent-skills/config/image-studio/config.json"
+    local legacy_cfg_trans="${HOME}/.tidex/tidex-agent-skills/config/tidex-image-studio/config.json"
+    local legacy_cfg_old="${HOME}/.config/tidex-image-studio/config.json"
+
+    # 若最终标准配置不存在，按优先级从过渡期配置或最早期历史配置中安全迁入
+    if [ ! -f "${target_cfg}" ]; then
+        if [ -f "${legacy_cfg_trans}" ]; then
+            mkdir -p "$(dirname "${target_cfg}")"
+            chmod 700 "$(dirname "${target_cfg}")"
+            cp "${legacy_cfg_trans}" "${target_cfg}"
+            chmod 600 "${target_cfg}"
+            echo -e "  ${GREEN}[✔ 配置迁移]${RESET} 已将过渡期配置安全迁入新路径: ${target_cfg}"
+            clean_status=false
+        elif [ -f "${legacy_cfg_old}" ]; then
+            mkdir -p "$(dirname "${target_cfg}")"
+            chmod 700 "$(dirname "${target_cfg}")"
+            cp "${legacy_cfg_old}" "${target_cfg}"
+            chmod 600 "${target_cfg}"
+            echo -e "  ${GREEN}[✔ 配置迁移]${RESET} 已将旧版配置 ~/.config/... 安全迁入新路径: ${target_cfg}"
+            clean_status=false
+        fi
+    fi
+
+    # 彻底清理所有旧版历史配置文件与空目录
+    if [ -f "${legacy_cfg_trans}" ]; then
+        rm -f "${legacy_cfg_trans}"
+        rmdir "$(dirname "${legacy_cfg_trans}")" 2>/dev/null || true
+        echo -e "  ${GREEN}[✔ 历史清理]${RESET} 已清理旧路径: ~/.tidex/tidex-agent-skills/config/tidex-image-studio"
+        clean_status=false
+    fi
+    if [ -f "${legacy_cfg_old}" ] || [ -d "${HOME}/.config/tidex-image-studio" ]; then
+        rm -f "${legacy_cfg_old}"
+        rmdir "${HOME}/.config/tidex-image-studio" 2>/dev/null || true
+        echo -e "  ${GREEN}[✔ 历史清理]${RESET} 已清理旧路径: ~/.config/tidex-image-studio"
+        clean_status=false
+    fi
+
+    # 2. 嗅探并清理旧版隐藏目录 ~/.tidex-skills
+    local legacy_hidden="${HOME}/.tidex-skills"
+    if [ -d "${legacy_hidden}" ]; then
+        rm -rf "${legacy_hidden}"
+        echo -e "  ${GREEN}[✔ 历史清理]${RESET} 已清理历史隐藏目录: ~/.tidex-skills"
+        clean_status=false
+    fi
+
+    # 3. 嗅探各 Agent 宿主环境中的旧版软链接（tidex-image-studio -> 清理为 image-studio）
+    local agent_paths=()
+    read -r -a agent_paths <<< "$(detect_agent_paths)"
+    local ap
+    for ap in "${agent_paths[@]}"; do
+        if [ -L "${ap}/tidex-image-studio" ]; then
+            rm -f "${ap}/tidex-image-studio"
+            echo -e "  ${GREEN}[✔ 软链净化]${RESET} 已清理 ${ap} 中的旧软链接: tidex-image-studio"
+            clean_status=false
+        fi
+    done
+
+    # 4. 嗅探用户主目录下的平铺仓库 ~/tidex-agent-skills
+    local flat_repo="${HOME}/tidex-agent-skills"
+    if [ -d "${flat_repo}" ] && [ "${flat_repo}" != "${SCRIPT_DIR}" ]; then
+        if [ ! -d "${GLOBAL_STORE_DIR}" ]; then
+            mkdir -p "$(dirname "${GLOBAL_STORE_DIR}")"
+            mv "${flat_repo}" "${GLOBAL_STORE_DIR}"
+            echo -e "  ${GREEN}[✔ 根目录净化]${RESET} 已将平铺仓库 ~/tidex-agent-skills 自动归口收纳至 ${GLOBAL_STORE_DIR}"
+            clean_status=false
+        fi
+    elif [ "${SCRIPT_DIR}" = "${flat_repo}" ]; then
+        NEED_PURIFY_NOTICE=true
+    fi
+
+    if $clean_status; then
+        echo -e "  ${GREEN}✔ 本地环境整洁合规，无历史冲突残留${RESET}"
+    fi
     echo ""
 }
 
@@ -121,6 +207,7 @@ ensure_source_skills() {
 do_install() {
     local custom_target="$1"
     print_banner
+    pre_install_migration_and_cleanup
     ensure_source_skills
 
     echo -e "${BOLD}[1/3] 确定技能基准存储库:${RESET}"
@@ -197,6 +284,25 @@ do_install() {
     echo -e "  • ${BOLD}code-repo-steward${RESET}   - 代码仓库管家（体检/立规/脱水瘦身/任务管理）"
     echo -e "  • ${BOLD}code-start-feature${RESET}  - 新功能从0到1启动开发（轻量规划/5点一线雷达扫）"
     echo -e "  • ${BOLD}code-refine-feature${RESET} - 已有功能精修与修补（快修直达/契约门禁/前后端对齐）"
+    echo -e "  • ${BOLD}image-studio${RESET}        - AI 图像创作工作站（统一路由与原生多模型驱动）"
+    echo -e "  • ${BOLD}skills-doctor${RESET}       - 全系统技能宿主环境体检管家"
+
+    if [ "${NEED_PURIFY_NOTICE:-false}" = "true" ]; then
+        echo ""
+        echo -e "${YELLOW}💡 [根目录净化建议] 检测到当前目录位于 ~/tidex-agent-skills。${RESET}"
+        echo -e "${YELLOW}   若您希望让主目录更清爽，可退回上一级后将本项目收纳至标准托管库:${RESET}"
+        echo -e "   cd ~ && mv ~/tidex-agent-skills ~/.tidex/tidex-agent-skills/store"
+    fi
+
+    # 尾部静默检查新版本（仅在有新版本时友好提醒）
+    if [ -f "${SCRIPT_DIR}/scripts/check_update.py" ] && command -v python3 >/dev/null 2>&1; then
+        local update_msg
+        update_msg="$(python3 "${SCRIPT_DIR}/scripts/check_update.py" --project "tidex-agent-skills" --repo "hanzhenlin/tidex-agent-skills" 2>/dev/null || true)"
+        if [[ "${update_msg}" == *"发现新版本"* ]]; then
+            echo ""
+            echo -e "${CYAN}${update_msg}${RESET}"
+        fi
+    fi
     echo "============================================================"
 }
 
@@ -233,6 +339,14 @@ do_uninstall() {
                 fi
             fi
         done
+
+        # 兼容清理旧版重命名遗留
+        if [ -L "${target_dir}/tidex-image-studio" ]; then
+            rm -f "${target_dir}/tidex-image-studio"
+            echo -e "    ${RED}✗ 已清理旧版历史软链接:${RESET} tidex-image-studio"
+            removed_count=$((removed_count + 1))
+            found_in_dir=1
+        fi
 
         if [ ${found_in_dir} -eq 0 ]; then
             echo -e "    ${CYAN}• 无 Tidex 挂载记录，已跳过${RESET}"
@@ -288,6 +402,14 @@ main() {
             ;;
         -u|--uninstall)
             do_uninstall
+            ;;
+        -c|--check-update)
+            if [ -f "${SCRIPT_DIR}/scripts/check_update.py" ] && command -v python3 >/dev/null 2>&1; then
+                python3 "${SCRIPT_DIR}/scripts/check_update.py" --project "tidex-agent-skills" --repo "hanzhenlin/tidex-agent-skills" --force
+            else
+                echo -e "${RED}[✗] 未找到更新检查脚本或未安装 python3。${RESET}"
+                exit 1
+            fi
             ;;
         -l|--list)
             do_list

@@ -1,7 +1,7 @@
-# Tidex Image Studio (全能 AI 图像创作工作站)
+# Image Studio (全能 AI 图像创作工作站)
 
 > 🎨 **面向开源生态设计的企业级多供应商、多模型 AI 生图工作站**  
-> 统一调度 Google Gemini Nano Banana 与 xAI Grok 等官方原生图像大模型，支持任意中转站无缝接入，具备智能命名路由、严格模型配套校验与「直读 > 代理 > URL」三级零丢图交付流水线。
+> 统一调度 Google Gemini 与 xAI Grok 等官方原生图像大模型，支持任意中转站无缝接入，具备智能命名路由、严格模型配套校验与「直读 > 代理 > URL」三级零丢图交付流水线。
 
 ---
 
@@ -9,7 +9,7 @@
 
 - **多大模型官方标准支持**：
   - **xAI Grok 官方生图家族**：`grok-imagine-image`（标准）、`grok-imagine-image-quality`（高画质）、`grok-imagine` 等；
-  - **Google Gemini 官方生图家族**：`gemini-3.1-flash-image`（Nano Banana 2）、`gemini-3-pro-image`。
+  - **Google Gemini 官方生图家族**：`gemini-3.1-flash-image`、`gemini-3-pro-image`。
 - **开源级多供应商配置**：用户可同时配置多家不同中转站（如 Sub2API、CC Host、官方直连等），赋予全局唯一 `name`，根配置自由切换 `default_provider`。
 - **严格模型配套校验 (Strict Compatibility Check)**：防跨站乱调扣费，若指定模型不属于该供应商受支持的 `models` 列表，本地毫秒级拦截报错。
 - **「直读 > 代理 > URL」三级交付流水线**：
@@ -22,14 +22,15 @@
 
 ## ⚙️ 快速配置
 
-配置文件固定存放在当前用户的私有安全目录（不进入项目工作区，不进 Git）：
-`~/.config/tidex-image-studio/config.json`
+配置文件统一定位在当前用户的 Tidex 项目专属安全目录（不进入项目工作区，不进 Git）：
+`~/.tidex/tidex-agent-skills/config/image-studio/config.json`
 
 ### 1. 复制示例配置
 ```bash
-mkdir -p ~/.config/tidex-image-studio
-cp config.example.json ~/.config/tidex-image-studio/config.json
-chmod 600 ~/.config/tidex-image-studio/config.json
+mkdir -p ~/.tidex/tidex-agent-skills/config/image-studio
+chmod 700 ~/.tidex/tidex-agent-skills/config/image-studio
+cp config.example.json ~/.tidex/tidex-agent-skills/config/image-studio/config.json
+chmod 600 ~/.tidex/tidex-agent-skills/config/image-studio/config.json
 ```
 
 ### 2. 编辑填入凭证
